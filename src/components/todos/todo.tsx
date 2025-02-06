@@ -43,19 +43,17 @@ const Todo: React.FC = () => {
 
   const handleEdit = (id: number, value: string) => {
     setTodos((todos) => {
-      /**
-       * 引数として渡された todo の id が一致する
-       * 更新前の todos ステート内の
-       * value(プロパティ)を引数 value (= e.target.value) に書き換える
-       */
       const newTodos = todos.map((todo) => {
         if (todo.id === id) {
-          todo.content = value;
+          return { ...todo, content: value};
         }
         return todo;
       });
-  
-  
+
+      console.log('=== Original todos ===');
+      todos.map((todo) => {
+        console.log(`id: ${todo.id}, content: ${todo.content}`);
+      });
       // todos ステートを更新
       return newTodos;
     });
