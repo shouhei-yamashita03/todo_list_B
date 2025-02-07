@@ -3,8 +3,10 @@ import React, { useState } from 'react';
 
 // "Todo" 型の定義をコンポーネント外で行います
 type Todo = {
-  content: string; // プロパティ content は文字列型
+  title: string; // プロパティ content は文字列型
   readonly id: number;
+  completed_flg: boolean;
+  delete_flg: boolean;
 };
 
 
@@ -23,8 +25,10 @@ const Todo: React.FC = () => {
 
     // 新しい Todo を作成
     const newTodo: Todo = {
-      content: text, // text ステートの値を content プロパティへ
+      title: text, // text ステートの値を content プロパティへ
       id: nextId,
+      completed_flg: false,
+      delete_flg: false,
     };
 
 
@@ -45,16 +49,40 @@ const Todo: React.FC = () => {
     setTodos((todos) => {
       const newTodos = todos.map((todo) => {
         if (todo.id === id) {
-          return { ...todo, content: value};
+          return { ...todo, title: value};
         }
         return todo;
       });
 
       console.log('=== Original todos ===');
       todos.map((todo) => {
-        console.log(`id: ${todo.id}, content: ${todo.content}`);
+        console.log(`id: ${todo.id}, title: ${todo.title}`);
       });
       // todos ステートを更新
+      return newTodos;
+    });
+  };
+
+  const handleCheck = (id: number, completed_flg: boolean) => {
+    setTodos((todos) => {
+      const newTodos = todos.map((todo) => {
+        if (todo.id === id) {
+          return { ...todo, completed_flg };
+        }
+        return todo;
+      });
+      return newTodos;
+    });
+  };
+
+  const handleRemove = (id: number, delete_flg: boolean) => {
+    setTodos((todos) => {
+      const newTodos = todos.map((todo) => {
+        if (todo.id === id) {
+          return { ...todo, delete_flg };
+        }
+        return todo;
+      });
       return newTodos;
     });
   };
@@ -72,19 +100,28 @@ const Todo: React.FC = () => {
           value={text} // フォームの入力値をステートにバインド
           onChange={(e) => setText(e.target.value)} // 入力値が変わった時にステートを更新
         />
-        <input type="submit" content="追加" /> {/* ボタンをクリックしてもonSubmitをトリガーしない */}
+         <button className="insert-btn" type="submit">追加</button> {/* ボタンをクリックしてもonSubmitをトリガーしない */}
       </form>
       <ul>
         {todos.map((todo) => {
           return (
             <li key={todo.id}>
-              <input 
-                type="text" 
-                value={todo.content}
+              <input
+                type="checkbox"
+                checked={todo.completed_flg}
+                onChange={() => handleCheck(todo.id, !todo.completed_flg)}
+              />
+              <input
+                type="text"
+                value={todo.title}
+                disabled={todo.completed_flg}
                 onChange={(e) => handleEdit(todo.id, e.target.value)}
               />
+              <button onClick={() => handleRemove(todo.id, !todo.delete_flg)}>
+                {todo.delete_flg ? '復元' : '削除'}
+              </button>
             </li>
-            );
+          );
         })}
       </ul>
     </div>
